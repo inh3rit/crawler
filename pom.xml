@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.zxsoft.crawler</groupId>
+    <artifactId>crawler</artifactId>
+    <version>3.4.beta</version>
+    <name>crawler</name>
+    <description>Crawler ${project.version} 网络與情爬虫</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>crawler-common</module>
+        <module>crawler-w</module>
+        <module>crawler-s</module>
+        <module>crawler-p</module>
+        <module>crawler-d</module>
+        <module>crawler-m</module>
+    </modules>
+
+    <properties>
+        <main.basedir>${project.basedir}</main.basedir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version-java>1.8</version-java>
+        <version-slf4j>1.7.12</version-slf4j>
+        <version-logback>1.1.3</version-logback>
+        <version-jsoup>1.7.3</version-jsoup>
+        <!--<version-httpclient>4.5</version-httpclient>-->
+        <version-jfinal>2.0</version-jfinal>
+        <version-driver-mysql>5.1.30</version-driver-mysql>
+        <version-druid>1.0.9</version-druid>
+        <version-jedis>2.7.3</version-jedis>
+        <version-fst>2.37</version-fst>
+        <version-commons-pool2>2.4.2</version-commons-pool2>
+        <version-fastjson>1.2.6</version-fastjson>
+        <version-junit>4.10</version-junit>
+        <version-nldp>1.0</version-nldp>
+        <!--<version-nldp>2.0.2</version-nldp>-->
+        <version-httphelper>1.0</version-httphelper>
+        <version-jetty>8.1.8</version-jetty>
+        <version-ansj>5.0.1</version-ansj>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.zxsoft.crawler</groupId>
+                <artifactId>crawler-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zxsoft.crawler</groupId>
+                <artifactId>crawler-parse</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zxsoft.crawler</groupId>
+                <artifactId>crawler-dao</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version-slf4j}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${version-logback}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${version-logback}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-access</artifactId>
+                <version>${version-logback}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${version-jsoup}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.inh3rit</groupId>
+                <artifactId>http-helper</artifactId>
+                <version>${version-httphelper}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jfinal</groupId>
+                <artifactId>jfinal</artifactId>
+                <version>${version-jfinal}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${version-druid}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>${version-jedis}</version>
+                <!--<scope>compile</scope>-->
+            </dependency>
+
+            <dependency>
+                <groupId>de.ruedigermoeller</groupId>
+                <artifactId>fst</artifactId>
+                <version>${version-fst}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${version-commons-pool2}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${version-driver-mysql}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${version-fastjson}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.inh3rit</groupId>
+                <!--<groupId>com.zxisl</groupId>-->
+                <artifactId>nldp</artifactId>
+                <version>${version-nldp}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jfinal</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${version-jetty}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version-junit}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.4.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.2</version>
+                    <configuration>
+                        <source>${version-java}</source>
+                        <target>${version-java}</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.18</version>
+                    <configuration>
+                        <skip>true</skip>
+                        <testFailureIgnore>true</testFailureIgnore>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <!--<repositories>-->
+        <!--<repository>-->
+            <!--<id>zxsoft-nexus</id>-->
+            <!--<name>zxsoft-nexus</name>-->
+            <!--<url>http://192.168.3.23:18081/nexus/content/groups/public</url>-->
+            <!--<layout>default</layout>-->
+            <!--<releases>-->
+                <!--<enabled>true</enabled>-->
+            <!--</releases>-->
+            <!--<snapshots>-->
+                <!--<enabled>false</enabled>-->
+            <!--</snapshots>-->
+        <!--</repository>-->
+
+        <!--<repository>-->
+            <!--<id>mvn-repo</id>-->
+            <!--<url>http://maven.nlpcn.org/</url>-->
+        <!--</repository>-->
+    <!--</repositories>-->
+
+</project>

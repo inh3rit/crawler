@@ -1,0 +1,271 @@
+<!--@var title={-->区域爬虫管理<!--@};-->
+
+<!--@var header={-->
+<link rel="stylesheet" href="${resPath}/uikit/2.24.2/css/components/tooltip.min.css">
+<style>
+    caption a {
+        font-style: normal !important;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script src="${resPath}/uikit/2.24.2/js/components/tooltip.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        var conf = {
+            url: {
+                save: basePath + '/reptile/save',
+                update: basePath + '/reptile/update',
+                del: basePath + '/reptile/delete'
+            }
+        };
+
+        $('.btn-operate').bind('click', function () {
+            var index = $(this).data('index');
+            if (!index) return;
+            var reptile = $(this).parent().parent().data('reptile');
+            var btnDelete = $('.btn-delete');
+            var spdform = $('#spiderconfform');
+            var spdfid = $('#spdfid');
+            switch (index) {
+                case 1: // 编辑
+                    spdform[0].reset();
+                    spdfid.val('');
+                    btnDelete.removeClass('uk-hidden');
+                    operateReptile(reptile);
+                    break;
+                case 2: // 删除
+                    UIkit.modal.confirm('确认删除当前区域?', function () {
+                        handlePost(conf.url.del, {id: spdfid.val()});
+                    });
+                    break;
+                case 3: // 修改
+                    break;
+                case 4: // 添加
+                    spdform[0].reset();
+                    spdfid.val('');
+                    btnDelete.addClass('uk-hidden');
+                    showEditJdbc(1);
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        $('#jobtype').bind('change', function () {
+            showEditJdbc($(this).val());
+            return false;
+        });
+
+        $('#spiderconfform').bind('submit', function () {
+
+            if (!$('#name').val()) {
+                showMsg('请输入区域名称', false);
+                return false;
+            }
+            if (!$('#alias').val()) {
+                showMsg('请输入区域别名', false);
+                return false;
+            }
+            var redis = $('#redis').val();
+            if (!redis) {
+                showMsg('请输入缓存服务器地址', false);
+                return false;
+            }
+            var rm = redis.match(/.*?:\d+/gi);
+            if (!rm || !rm.length) {
+                showMsg('缓存服务器地址错误', false);
+                return false;
+            }
+            var spdfid = $('#spdfid').val();
+            var url = spdfid ? conf.url.update : conf.url.save;
+            handlePost(url, $(this).serialize());
+            return false;
+        });
+
+        function handlePost(url, data) {
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'post',
+                dataType: 'json'
+            }).done(function (data) {
+                showMsg(data.msg, data.status > 0);
+                if (data.status < 1) return;
+                window.setTimeout(function () {
+                    window.location.reload();
+                }, 500);
+            });
+        }
+
+        function showEditJdbc(show) {
+            var rh = $('.reptile-hidden');
+            show == 2 ? rh.addClass('uk-hidden') : rh.removeClass('uk-hidden');
+        };
+
+        function showMsg(msg, stat) {
+            UIkit.notify(msg, {pos: 'top-right', status: stat ? 'success' : 'danger'});
+        };
+
+        function operateReptile(reptile) {
+            $('#name').val(reptile.name);
+            $('#redis').val(reptile.redis);
+            // $('#master').val(reptile.master);
+            $('#spdfid').val(reptile.id);
+            $('#jobtype').val(reptile.type_id);
+            $('#alias').val(reptile.alias);
+            console.log(reptile.url);
+            console.log(reptile.type);
+            if (reptile.type_id != 2) {
+                $('#oclurl').val(reptile.url);
+                $('#oclusr').val(reptile.usr);
+                // $('#oclpwd').val('');
+                $('#active').val(reptile.active);
+                $('#location').val(reptile.location);
+            }
+            showEditJdbc(reptile.type_id);
+        };
+
+    });
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span class="uk-active">区域管理</span>
+</ul>
+<hr class="uk-article-divider">
+
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-striped uk-table-hover">
+        <caption>爬虫区域列表 <a href="#editreptile" class="btn-operate uk-button uk-button-primary" data-index="4"
+                           data-uk-modal>新区域</a></caption>
+        <thead>
+        <tr>
+            <th>名称
+            <th>别名
+                <!--<th>缓存服务器-->
+            <th>任务类型
+            <th>操作
+        <tbody>
+        <!--@ for(var i=0; i<reptiles.~size; i++) {
+        -->
+        <tr data-reptile="${toJson(reptiles[i], 1)}">
+            <td>${reptiles[i].name}
+            <td>${reptiles[i].alias}
+                <!--<td>${reptiles[i].redis}-->
+            <td>${reptiles[i].type_name}
+            <td>
+                <!--<a href="${basePath}/monitor?reptile=${reptiles[i].id}" class="btn-operate">监控</a>-->
+                <a href="#editreptile" class="uk-button uk-button-link btn-operate" data-index="1" data-uk-modal>编辑</a>
+                <!--<a href="#" class="btn-operate" data-index="2">删除</a>-->
+                <!--@
+                }
+                -->
+    </table>
+</div>
+
+
+<div id="editreptile" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close" type="button"></button>
+        <div class="uk-modal-header">
+            <h2>编辑区域信息</h2>
+        </div>
+        <form id="spiderconfform" method="post" class="uk-form uk-form-stacked" autocomplete="off">
+            <div class="uk-form-row">
+                <label class="form-label" for="name">名称</label>
+                <div class="uk-form-controls">
+                    <input id="name" type="text" class="uk-width-1-1" name="name" required placeholder="名称"/>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-label" for="redis">缓存服务器</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="redis" class="uk-width-1-1" name="redis" required data-uk-tooltip
+                           title="host:port" placeholder="缓存服务器"/>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-label" for="jobtype">任务类型</label>
+                <div class="uk-form-controls">
+                    <select name="type" id="jobtype" class="uk-width-1-1" required>
+                        <option value="">请选择</option>
+                        <!--@
+                        for (var i=0; i<types.~size; i++) {
+                        -->
+                        <option value="${types[i].type}">${jobType(types[i].type)}
+                            <!--@
+                            }
+                            -->
+                    </select>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-label" for="alias">区域别名</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="alias" class="uk-width-1-1" name="alias" required data-uk-tooltip
+                           title="别名用于爬虫机标识, 爬虫机根据这个标识来确认从何处获取任务"
+                           placeholder="区域别名"/>
+                </div>
+            </div>
+            <div class="uk-form-row reptile-hidden">
+                <div class="uk-form-controls" id="locationDiv">
+                    <label class="form-label" for="location">地区(拥有独立爬虫)</label>
+                    <select name="location" id="location" class="uk-width-2-1">
+                        <option value="">无独立爬虫</option>
+                        <!--@
+                        for (var i=0; i<locations.~size; i++) {
+                        -->
+                        <option value="${locations[i].id}">${locations[i].name}</option>
+                        <!--@
+                        }
+                        -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="uk-form-row reptile-hidden">
+                <label class="form-label" for="oclurl">任务数据库 JDBC 链接</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="oclurl" class="uk-width-1-1" name="url" placeholder="任务数据库 JDBC 链接"/>
+                </div>
+            </div>
+            <div class="uk-form-row reptile-hidden">
+                <label class="form-label" for="oclusr">数据库账户</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="oclusr" class="uk-width-1-1" name="usr" placeholder="数据库账户"/>
+                </div>
+            </div>
+            <div class="uk-form-row reptile-hidden">
+                <label class="form-label" for="oclpwd">数据库密码</label>
+                <div class="uk-form-controls">
+                    <input type="password" id="oclpwd" class="uk-width-1-1" name="passwd" placeholder="***"
+                           data-uk-tooltip
+                           title="无密码或密码不变动, 添加或修改时无需填写"/>
+                </div>
+            </div>
+            <div class="uk-form-row reptile-hidden">
+                <label class="form-label" for="oclactive">最大连接数</label>
+                <div class="uk-form-controls">
+                    <input type="text" id="oclactive" class="uk-width-1-1" name="active" value="40" required/>
+                </div>
+            </div>
+
+            <div class="uk-form-row uk-text-right">
+                <button class="btn-operate btn-delete uk-button uk-button-danger" type="button" data-index="2">删除
+                </button>
+                <button class="btn-operate uk-button uk-button-primary" data-index="3">保存</button>
+            </div>
+            <input type="hidden" name="id" id="spdfid">
+        </form>
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

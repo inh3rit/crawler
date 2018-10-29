@@ -1,0 +1,76 @@
+<!--@var title={-->综合搜索 ${paras.kw!''!='' ? print('-') : print('')} ${paras.kw!''}<!--@};-->
+
+<!--@var header={-->
+<style>
+    .section-li .highlight {
+        font-style: normal;
+        font-weight: normal;
+        color: #dd4b39 !important;
+        background: transparent !important;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script src="${resPath}/js/jquery.highlight-5.closure.js"></script>
+<script>
+$(document).ready(function(){
+    $('dd').highlight($('#kw').val());
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li class="uk-active"><span>综合搜索</span>
+</ul>
+<hr class="uk-article-divider">
+
+<div>
+    <div class="uk-row-indent">
+        <form class="uk-form">
+            <input type="text" id="kw" name="kw" value="${paras.kw!''}" placeholder="關鍵字"/>
+            <button class="uk-button">檢索</button>
+            <a href="${basePath}/website/section/query">清除条件</a>
+        </form>
+    </div>
+    <div class="uk-row-indent">
+        <!--@
+        if (0==p.list.~size!0) {
+        -->
+        <dl class="uk-description-list-horizontal">
+            <dt>
+            <dd>找不到符合搜尋字詞「${paras.kw}」的项目。
+        </dl>
+        <!--@
+        } else {
+        for(var i=0; i<p.list.~size; i++) {
+        -->
+        <dl class="uk-description-list-horizontal">
+            <dt>站點名稱
+            <dd>${p.list[i].website_name}
+            <dt>板塊名稱
+            <dd>${p.list[i].category_name}
+            <dt>板塊地址
+            <dd>${p.list[i].url}
+            <a href="${p.list[i].url}" target="_blank" title="查看站點"><i class="uk-icon-external-link"></i></a>
+            <dt>創建人
+            <dd>${p.list[i].username}
+            <dt>操作
+            <dd>
+            <a href="${basePath}/website/section?id=${p.list[i].site}">該站點板塊</a>
+            <a href="${basePath}/website/conf?id=${p.list[i].id}">查看板塊配置</a>
+        </dl>
+        <!--@
+        }}
+        -->
+    </div>
+</div>
+
+${pagination(request, p.totalRow, p.totalPage, p.pageNumber, p.pageSize, 'page')}
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

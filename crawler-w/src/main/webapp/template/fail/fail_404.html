@@ -1,0 +1,34 @@
+<!--@var title={-->未找到当前板块信息<!--@};-->
+
+<!--@var header={-->
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+    $(document).ready(function(){
+        $('#goback').bind('click', function(){
+            window.history.go(-1);
+            return false;
+        });
+        $('#gohome').bind('click', function(){
+            window.location.href = '${basePath}/';
+            return false;
+        });
+    });
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+
+<div>
+    <h2>404 NOT FOUND</h2>
+    <p>未发现当前页面, 或者已经被删除, 请检查板块后继续
+    <p><a href="#" id="goback">返回上一页</a>
+    <a href="#" id="gohome">返回首页</a>
+</div>
+
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

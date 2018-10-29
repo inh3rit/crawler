@@ -1,0 +1,43 @@
+<!--@var title={-->帮助<!--@};-->
+
+<!--@var header={-->
+<style>
+    article h2 {
+        display: block;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        text-align: center;
+    }
+    section div {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    section h3 {
+        display: block;
+        border-bottom: 1px solid #ccc;
+    }
+
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+
+<!--@};-->
+
+<!--@var container={-->
+<article>
+    <h2>爬虫运行流程图</h2>
+    <section>
+        <div>
+            <h3>爬虫运转流程图</h3>
+            <img src="${resPath}/design/Crawler.png" alt="Crawler">
+        </div>
+        <div>
+            <h3>全网搜索任务分配流程图</h3>
+            <img src="${resPath}/design/Master-network-job.png" alt="Master-network-job">
+        </div>
+    </section>
+</article>
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

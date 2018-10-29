@@ -1,0 +1,107 @@
+<!--@var title={-->区域配置选择<!--@};-->
+
+<!--@var header={-->
+<link rel="stylesheet" href="${resPath}/uikit/2.24.2/css/components/sortable.min.css">
+<link rel="stylesheet" href="${resPath}/uikit/2.24.2/css/components/tooltip.min.css">
+<style>
+    .box-prop span {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script src="${resPath}/uikit/2.24.2/js/components/sortable.min.js"></script>
+<script src="${resPath}/uikit/2.24.2/js/components/tooltip.min.js"></script>
+<script>
+$(document).ready(function(){
+
+    $('.btn-submit').bind('click', function(){
+        var modal = UIkit.modal.blockUI('正在提交, 请稍后 ...');
+        $.ajax({
+            url: basePath + '/prop/save_reptile_prop',
+            data: $('#reptilepropform').serialize(),
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            UIkit.notify(data.msg, {pos:'top-right', status: data.status>0 ? 'success' : 'danger'});
+            modal.hide()
+        });
+    });
+
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span>爬虫服务配置</span>
+    <li class="uk-active"><span>区域配置选择</span>
+</ul>
+<hr class="uk-article-divider">
+
+
+<div class="uk-grid uk-grid-width-1-2">
+
+    <div>
+
+        <h3>配置项</h3>
+
+        <div data-uk-sortable="{group:'prop'}" id="box_prop" class="uk-sortable uk-margin">
+            <!--@
+            for (var i=0; i<props.~size; i++) {
+            -->
+            <div class="uk-margin">
+                <div class="uk-panel uk-panel-box box-prop" title="${props[i].mark!'', xss}" data-uk-tooltip>
+                    <p>「 <span class="uk-text-primary">${confKey(props[i].name)}</span> 」
+                        <span class="uk-text-danger">:</span>
+                        <span class="uk-text-success">${props[i].val, xss}</span>
+                </div>
+                <input type="hidden" name="name" value="${props[i].name}">
+                <input type="hidden" name="id" value="${props[i].id}">
+            </div>
+            <!--@
+            }
+            -->
+        </div>
+
+    </div>
+    <div>
+
+        <h3>
+            ${reptile.name, xss} - ${reptile.alias, xss}
+            <button class="uk-button uk-button-primary btn-submit">提交</button>
+        </h3>
+
+        <form action="#" id="reptilepropform" autocomplete="off">
+            <div data-uk-sortable="{group:'prop'}" id="box_reptile_prop" class="uk-sortable uk-margin">
+                <!--@
+                for (var i=0; i<rps.~size; i++) {
+                -->
+                <div class="uk-margin">
+                    <div class="uk-panel uk-panel-box box-prop" title="${rps[i].mark!'', xss}" data-uk-tooltip>
+                        <p>「 <span class="uk-text-warning">${confKey(rps[i].name)}</span> 」
+                            <span class="uk-text-danger">:</span>
+                            <span class="uk-text-success">${rps[i].val, xss}</span>
+                        <input type="hidden" name="name" value="${rps[i].name}">
+                        <input type="hidden" name="id" value="${rps[i].prop}">
+                    </div>
+                </div>
+                <!--@
+                }
+                -->
+            </div>
+            <input type="hidden" name="reptile" value="${reptile.id}">
+        </form>
+
+    </div>
+
+
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

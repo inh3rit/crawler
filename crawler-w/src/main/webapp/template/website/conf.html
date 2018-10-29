@@ -1,0 +1,391 @@
+<!--@var title={-->配置<!--@};-->
+
+<!--@var header={-->
+<link rel="stylesheet" href="${resPath}/uikit/2.24.2/css/components/tooltip.min.css">
+<style>
+.uk-badge a {
+    color: #fff;
+}
+#modal_unused .uk-article h2 {
+    font-size: 20px;
+}
+#modal_unused .uk-article-meta span,
+#modal_unused .uk-article-meta a {
+    margin-right: 3px;
+}
+#modal_unused article {
+    border-left: 5px solid #ddd;
+    padding-left: 15px;
+}
+/*.form-row-btn {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+}*/
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script src="${resPath}/uikit/2.24.2/js/components/tooltip.min.js"></script>
+<script>
+$(document).ready(function(){
+
+    var conf = {
+        url: {
+            save_conf_list: basePath + '/website/conf/save_conf_list',
+            save_conf_detail: basePath + '/website/conf/save_conf_detail'
+        }
+    };
+
+    $('.btn-more').bind('click', function(){
+        var type = $(this).data('type');
+        var stat = $(this).data('stat');
+        var box = '';
+        switch (type) {
+            case 1:
+                box = '#listform';
+                break;
+            case 2:
+                box = '#detailform';
+                break;
+        }
+        $(this).data({stat: !stat});
+        !stat ?
+        $(box + ' .conf-hidden').removeClass('uk-hidden') :
+        $(box + ' .conf-hidden').addClass('uk-hidden');
+    });
+
+
+    $('#listform').bind('submit', function(){
+        postData(conf.url.save_conf_list, $(this).serialize());
+        return false;
+    });
+
+    $('#detailform').bind('submit', function(){
+        postData(conf.url.save_conf_detail, $(this).serialize());
+        return false;
+    });
+
+
+    function postData(url, data) {
+        $.ajax({
+            url: url,
+            data: data,
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            UIkit.notify(data.msg, {pos:'top-right', status: data.status>0 ? 'success' : 'danger'});
+        });
+    }
+
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span>配置</span>
+    <li><a href="${basePath}/website/section?id=${website.id!''}">${website.comment!''}</a>
+    <li class="uk-active"><span>${section.comment!''}</span>
+</ul>
+<hr class="uk-article-divider">
+
+
+<div class="uk-grid">
+
+    <div class="uk-width-medium-1-2 uk-row-indent">
+        <div class="uk-panel uk-panel-box">
+            <h3 class="uk-panel-title">列表頁規則</h3>
+
+            <form class="uk-form uk-form-stacked" id="listform" autocomplete="off">
+
+                <div class="uk-form-row">
+                    <button class="uk-button uk-button-primary">保存</button>
+                </div>
+
+                <div class="uk-form-row">
+                    <label for="listdom" class="uk-form-label">列表页 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="listdom" name="listdom" value="${confList.listdom!'', xss}" placeholder="列表页 DOM" required />
+                        <span class="uk-form-help-inline">列表頁 DOM 規則, 爲各站點搜索結果頁中所有結果列表父容器</span>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label for="linedom" class="uk-form-label">列表行 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="linedom" name="linedom" value="${confList.linedom!'', xss}" placeholder="列表行 DOM" required />
+                        <span class="uk-form-help-inline">列表行 DOM 規則是搜索結果頁面中單個搜索結果容器</span>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label for="urldom" class="uk-form-label">詳細頁 URL DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="urldom" name="urldom" value="${confList.urldom!'', xss}" placeholder="詳細頁 URL DOM" required />
+                        <span class="uk-form-help-inline">詳細頁 URL DOM 是搜索結果頁中, 跳轉至目標網站 DOM 節點</span>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label for="datedom" class="uk-form-label">發佈時間 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="datedom" name="datedom" value="${confList.datedom!'', xss}" placeholder="發佈時間 DOM">
+                        <span class="uk-form-help-inline">搜索結果頁面中目標網站的發佈時間, 有時這並不是必須的 <a href="#modal_unused" data-uk-modal>詳情</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <button class="uk-button uk-button-link btn-more" type="button" data-type="1" data-uk-tooltip
+                            title="这里面的配置项通常都很少或者暂未使用到的配置项, 若非特殊需求, 可无须关心">更多配置 <i class="uk-icon-caret-down"></i></button>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="authordom" class="uk-form-label">作者 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="authordom" name="authordom" value="${confList.authordom!'', xss}" placeholder="作者 DOM" />
+                        <span class="uk-form-help-inline">搜索結果列表頁面中, 單個搜索結果創建作者名稱</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="updatedom" class="uk-form-label">更新时间 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="updatedom" name="updatedom" value="${confList.updatedom!'', xss}" placeholder="更新时间 DOM" />
+                        <span class="uk-form-help-inline">搜索結果列表頁面中, 單個搜索結果更新時間</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="synopsisdom" class="uk-form-label">简介 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="synopsisdom" name="synopsisdom" value="${confList.synopsisdom!'', xss}" placeholder="简介 DOM" />
+                        <span class="uk-form-help-inline">搜索結果列表頁面中, 單個搜索結果摘要區域</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="comment" id="comment" value="${section.comment!'', xss}"  />
+                <input type="hidden" name="url" id="url" value="${section.url}" />
+                <input type="hidden" name="section" value="${section.id}" />
+            </form>
+        </div>
+    </div>
+
+    <div class="uk-width-medium-1-2 uk-row-indent">
+        <div class="uk-panel uk-panel-box">
+            <h3 class="uk-panel-title">詳細頁規則</h3>
+            <form class="uk-form uk-form-stacked" id="detailform" autocomplete="off">
+
+                <div class="uk-form-row">
+                    <button class="uk-button uk-button-primary">保存</button>
+                </div>
+
+                <div class="uk-form-row">
+                    <label for="date" class="uk-form-label">发布时间 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="date" name="date" value="${confDetail.date!'', xss}" placeholder="发布时间 DOM" />
+                        <span class="uk-form-help-inline">文章發佈時間 DOM, 有時這並不是必須的 <a href="#modal_unused" data-uk-modal>詳情</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label for="content" class="uk-form-label">内容 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="content" name="content" value="${confDetail.content!'', xss}" placeholder="内容 DOM" required />
+                        <span class="uk-form-help-inline">文章內容 DOM 節點</span>
+                    </div>
+                </div>
+
+
+                <div class="uk-form-row">
+                    <button class="uk-button uk-button-link btn-more" type="button" data-type="2" data-uk-tooltip
+                            title="这里面的配置项通常都很少或者暂未使用到的配置项, 若非特殊需求, 可无须关心">更多配置 <i class="uk-icon-caret-down"></i></button>
+                </div>
+
+
+
+
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label class="uk-form-label">Ajax 加载</label>
+                    <div class="uk-form-controls">
+                        <label><input type="radio" name="ajax" value="1"  /> 是</label>
+                        <label><input type="radio" name="ajax" value="0" /> 否</label>
+                        <span class="uk-form-help-inline">該站點是否使用 AJAX 加載</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+                <!--<div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="host" class="uk-form-label">域名</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="host" name="host" value="${confDetail.host!'', xss}" placeholder="域名"/>
+                        <span class="uk-form-help-inline"></span>
+                    </div>
+                </div>-->
+
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="replyNum" class="form-label">回复数 DOM</label>
+                    <div class="uk-form-controls">
+                        <input id="replyNum" name="replyNum" class="easyui-textbox easyui-tooltip" value="${confDetail.replyNum!'', xss}" placeholder="回复数 DOM" />
+                        <span class="uk-form-help-inline">文章回覆數量 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="reviewNum" class="form-label">浏览数 DOM</label>
+                    <div class="uk-form-controls">
+                        <input id="reviewNum" name="reviewNum" value="${confDetail.reviewNum!'', xss}" placeholder="浏览数 DOM" />
+                        <span class="uk-form-help-inline">文章瀏覽數量 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="forwardNum" class="form-label">转发数 DOM</label>
+                    <div class="uk-form-controls">
+                        <input id="forwardNum" name="forwardNum" value="${confDetail.forwardNum!'', xss}" placeholder="转发数 DOM" />
+                        <span class="uk-form-help-inline">文章轉發數量 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="sources" class="form-label">来源 DOM</label>
+                    <div class="uk-form-controls">
+                        <input id="sources" name="sources" value="${confDetail.sources!'', xss}" placeholder="来源 DOM" />
+                        <span class="uk-form-help-inline">文章來源 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label class="uk-form-controls">抓取顺序</label>
+                    <div class="uk-form-controls">
+                        <label><input type="radio" name="fetchOrder" value="1"  /> 从第一页开始</label>
+                        <label><input type="radio" name="fetchOrder" value="0"  /> 从最后一页开始</label>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+
+
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="author" class="form-label">楼主 DOM</label>
+                    <div class="uk-form-controls">
+                        <input id="author" name="author" value="${confDetail.author!'', xss}" placeholder="楼主 DOM" />
+                        <span class="uk-form-help-inline">如果抓取的網站是論壇, 這裏配置樓主 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+
+
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="reply" class="form-label">回复 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="reply" name="reply" value="${confDetail.reply!'', xss}" placeholder="回复 DOM" />
+                        <span class="uk-form-help-inline">回覆原文 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="replyAuthor" class="form-label">作者 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="replyAuthor" name="replyAuthor" value="${confDetail.replyAuthor!'', xss}" placeholder="作者 DOM" />
+                        <span class="uk-form-help-inline">回覆人 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="replyDate" class="form-label">回复时间 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="replyDate" name="replyDate" value="${confDetail.replyDate!'', xss}" placeholder="回复时间 DOM" />
+                        <span class="uk-form-help-inline">回覆時間 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="replyContent" class="form-label">回复内容 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="replyContent" name="replyContent" value="${confDetail.replyContent!'', xss}" placeholder="回复内容 DOM" />
+                        <span class="uk-form-help-inline">回覆內容 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="subReply" class="form-label">子回复 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="subReply" name="subReply" value="${confDetail.subReply!'', xss}" placeholder="子回复 DOM" />
+                        <span class="uk-form-help-inline">子回覆區域 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="subReplyAuthor" class="form-label">作者 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="subReplyAuthor" name="subReplyAuthor" value="${confDetail.subReplyAuthor!'', xss}" placeholder="作者 DOM" />
+                        <span class="uk-form-help-inline">子回覆人 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="subReplyDate" class="form-label">子回复时间 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="subReplyDate" name="subReplyDate" value="${confDetail.subReplyDate!'', xss}" placeholder="子回复时间 DOM" />
+                        <span class="uk-form-help-inline">子回覆時間 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+                <div class="uk-form-row uk-animation-slide-top conf-hidden uk-hidden">
+                    <label for="subReplyContent" class="form-label">子回复内容 DOM</label>
+                    <div class="uk-form-controls">
+                        <input type="text" id="subReplyContent" name="subReplyContent" value="${confDetail.subReplyContent!'', xss}" placeholder="子回复内容 DOM" />
+                        <span class="uk-form-help-inline">子回覆內容 DOM</span>
+                        <span class="uk-form-help-inline uk-badge uk-badge-danger"><a href="#modal_note" data-uk-modal>注意</a></span>
+                    </div>
+                </div>
+
+                <input name="listurl" type="hidden" value="${section.url}" />
+                <input name="oldHost" type="hidden" value="${website.site }" />
+                <input type="hidden" name="host" value="${website.site}">
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<div id="modal_unused" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close"></button>
+        <h1>列表页时间 & 详细页时间</h1>
+        <hr class="uk-article-divider">
+        <article class="uk-article">
+            <h2 class="uk-article-title">全网搜索</h2>
+            <p>全网搜索时间提取, 无需配置详细页时间, 另列表页时间规则使用权重也极低, 只有在
+                <a href="${basePath}/timereg">时间规则</a> 和 <code>时间提取器</code> 均无法提取出时间的
+                情况下才会使用此选择器来提取时间.
+            <p>因此, 若是全网搜索站点, 通常意义上发布时间选择器配置是无意义的.
+        </article>
+        <article class="uk-article">
+            <h2 class="uk-article-title">网络巡检</h2>
+            <p>网络巡检因为是定向站点抓取, 未使用 <a href="${basePath}/timereg">时间规则</a> 和 <code>时间提取器</code>
+            时间提取完全依赖这里配置的规则;
+            <p>需要注意的是, 巡检任务时间提取为了保证时间提取的准确性, 建议将时间规则写在内容页中, 当也并非全部如此,
+            若内容页没有发布时间或者发布时间的规则很难取到数据, 那么就可以考虑将时间规则写入在列表页中;
+            <p>若发布时间在列表页中, 详细页中的时间规则就无须配置, 这会导致爬虫做无意义的逻辑操作, 降低爬虫性能.
+        </article>
+    </div>
+</div>
+<div id="modal_note" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close"></button>
+        <h1>配置注意</h1>
+        <p>以下未被提及到的配置暂时均未被使用
+        <ul class="uk-list">
+            <li><code>简介 DOM</code> 较早之前的爬虫程序有使用这个配置, 来抓取列表页中单个搜索结果的摘要,
+                不过在后续更新的版本中, 此规则现以未在使用, 所有内容均从内容页面中抓取, 不考虑摘要信息.
+        </ul>
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

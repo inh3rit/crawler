@@ -1,0 +1,41 @@
+<!--@var title={-->网络巡检<!--@};-->
+
+<!--@var header={-->
+
+<!--@};-->
+
+<!--@var footer={-->
+
+<!--@};-->
+
+<!--@var container={-->
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li class="uk-active"><span>网络巡检</span>
+</ul>
+<hr class="uk-article-divider">
+<!--@
+if (0==list.~size!0) {
+-->
+<dl class="uk-description-list-horizontal">
+    <dt>
+    <dd>未有网络巡检区域
+</dl>
+<!--@
+} else {
+for(var i=0; i<list.~size; i++) {
+-->
+<dl class="uk-description-list-horizontal">
+    <dt>名称
+    <dd>${list[i].name}
+    <dt>别名
+    <dd>${list[i].alias}
+    <dt>操作
+    <dd><a href="${basePath}/patrol/job?reptile=${list[i].id}" class="btn-operate">任务管理</a>
+</dl>
+<!--@
+}}
+-->
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

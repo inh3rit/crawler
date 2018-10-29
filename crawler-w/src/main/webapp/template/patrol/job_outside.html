@@ -1,0 +1,88 @@
+<!--@var title={-->${reptile.alias!''} - ${reptile.name!''} | 网络巡检任务管理<!--@};-->
+
+<!--@var header={-->
+
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+//    Array.prototype.remove = function (dx) {
+//        if (isNaN(dx) || dx > this.length) {
+//            return false;
+//        }
+//        for (var i = 0, n = 0; i < this.length; i++) {
+//            if (this[i] != this[dx]) {
+//                this[n++] = this[i];
+//            }
+//        }
+//        this.length -= 1;
+//        return true;
+//    };
+    $(document).ready(function () {
+
+//        var data = {};
+//        $("#sites option").each(function(i,el) {
+//            data[$(el).data("val")] = $(el).val();
+//        });
+//        var sections = [];
+
+
+        $('#jobform').bind('submit', function () {
+            var modal = UIkit.modal.blockUI('正在提交, 请稍后...');
+            $.ajax({
+                url: basePath + '/patrol/save_job',
+                data: $(this).serialize(),
+                type: 'post',
+                dataType: 'json'
+            }).done(function (data) {
+                UIkit.notify(data.msg, {pos:'top-right', status: data.status > 0 ? 'success' : 'danger'});
+                modal.hide();
+            });
+            return false;
+        });
+
+    });
+</script>
+<style type="text/css">
+    .mul-li{ width:100%; float:left;}
+    .mul-li ul{ width:100%;}
+    .mul-li li{ width:20%; float:left; display:block;}
+</style>
+<!--@};-->
+
+<!--@var container={-->
+
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><a href="${basePath}/patrol">网络巡检</a>
+    <li class="uk-active"><span>${reptile.alias!''} - ${reptile.name!''}</span>
+</ul>
+<hr class="uk-article-divider">
+
+
+<div>
+    <form action="#" id="jobform" class="uk-form" autocomplete="off">
+        <div class="uk-form-row mul-li">
+            <ul class="uk-list uk-list-inline ">
+                <!--@
+                for (var i=0; i<so.~size; i++) {
+                -->
+                <li>
+                    <input type="checkbox" name="section" id="sec-${so[i].section_id}" value="${so[i].section_id}" ${so[i].reptile!=null ? 'checked' : ''}>
+                    <label for="sec-${so[i].section_id}">${so[i].site_name} - ${so[i].section_name}</label>
+                    <a href="${basePath}/website/section?id=${so[i].website_id}">板块</a>
+                    <a href="${basePath}/website/conf?id=${so[i].section_id}">配置</a>
+                </li>
+                <!--@}-->
+            </ul>
+        </div>
+        <div class="uk-form-row">
+            <button class="uk-button">提交</button>
+        </div>
+        <input type="hidden" name="reptile" value="${paras.reptile}">
+    </form>
+</div>
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

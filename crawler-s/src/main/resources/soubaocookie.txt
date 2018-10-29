@@ -1,0 +1,22 @@
+test_test
+
+<add key="mysqlcon" value="server=192.168.32.32;user=root;database=yqjk;port=3306;password=zxsoft2014;pooling=true;Max Pool Size=5;"/>
+
+test_test
+
+/// <summary>
+/// 设置cookie
+/// </summary>
+public static Cookie AddCookieSUV()
+{
+DateTime dtStart = DateTime.Parse("1970-01-01");
+DateTime dtNow = DateTime.Now;
+TimeSpan ts = dtNow - dtStart;
+double suvnum = ts.TotalMilliseconds * 1000 + new Random().Next(100, 999);
+Cookie cookie = new Cookie("SUV", suvnum.ToString());
+cookie.Path = "/";
+cookie.Domain = ".sogou.com";
+cookie.Expires = DateTime.Now.AddYears(1);
+ClientCookies.Add(cookie);
+return cookie;
+}

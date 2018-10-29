@@ -1,0 +1,63 @@
+<!--@var title={-->注册<!--@};-->
+
+<!--@var header={-->
+
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+$(document).ready(function(){
+    $('#regform').bind('submit', function(){
+        $.ajax({
+            url: basePath + '/account/doreg',
+            data: $(this).serialize(),
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            UIkit.notify(data.msg, {pos:'top-right', status: data.status>0 ? 'success' : 'danger'});
+            window.setTimeout(function(){
+                window.location.href = basePath + '/account/sign?from=reg&name=' + $('input[name=name]').val();
+            }, 500);
+        });
+        return false;
+    });
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+
+<div class="uk-vertical-align uk-text-center uk-height-1-1">
+    <div class="uk-vertical-align-middle">
+
+        <img class="uk-margin-bottom" width="140" height="120" src="${resPath}/img/spider.png" alt="">
+
+        <h2>中新網絡與情爬蟲</h2>
+
+
+        <form id="regform" class="uk-panel uk-panel-box uk-form" autocomplete="off">
+            <div class="uk-form-row">
+                <input class="uk-width-1-1 uk-form-large" type="text" name="name" placeholder="賬戶" value="${paras.name!''}">
+            </div>
+            <div class="uk-form-row">
+                <div class="uk-form-password">
+                    <input class="uk-width-1-1 uk-form-large" type="password" name="passwd" placeholder="密碼">
+                    <a href="" class="uk-form-password-toggle" data-uk-form-password="{lblShow:'<i class=&quot;uk-icon-lock&quot;></i>', lblHide:'<i class=&quot;uk-icon-unlock&quot;></i>'}"><i class="uk-icon-lock"></i></a>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <button class="uk-width-1-1 uk-button uk-button-primary uk-button-large" href="#">注册</button>
+            </div>
+            <!--<div class="uk-form-row uk-text-small">
+                <label class="uk-float-left"><input type="checkbox"> Remember Me</label>
+                <a class="uk-float-right uk-link uk-link-muted" href="#">Forgot Password?</a>
+            </div>-->
+        </form>
+
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_account.html", {title: title, header: header, container: container, footer: footer}){}-->

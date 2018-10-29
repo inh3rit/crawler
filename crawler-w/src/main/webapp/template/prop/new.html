@@ -1,0 +1,177 @@
+<!--@var title={-->添加配置<!--@};-->
+
+<!--@var header={-->
+<style>
+    .box-conf {
+        margin-top: 5px;
+    }
+    .conf-mark:after {
+        clear: both;
+        content: '.';
+        height: 0;
+        visibility: hidden;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+$(document).ready(function(){
+
+    var conf = {
+        url: {
+            save: basePath + '/prop/save',
+            update: basePath + '/prop/update',
+            del: basePath + '/prop/delete'
+        }
+    };
+
+    $('.btn-ud').bind('click', function(){
+        var index = $(this).data('index');
+        var keySelect = $('#key');
+        var npForm = $('#npform');
+        var idInput = $('#id');
+        var btnDelete = $('.btn-delete');
+        $('#keyinput').remove();
+        switch (index) {
+            case 1:
+                $('<input type="hidden" name="key" id="keyinput">').appendTo(npForm);
+                var prop = $(this).data('prop');
+                keySelect.prop({disabled: true});
+                keySelect.val(prop.name);
+                $('#val').val(prop.val);
+                $('#mark').val(prop.mark);
+                $('#keyinput').val(prop.name);
+                idInput.val(prop.id);
+                btnDelete.removeClass('uk-hidden');
+                break;
+            case 2: // 删除
+                UIkit.modal.confirm('确认删除当前配置?', function(){
+                    var id = $('#id').val();
+                    handlePost(conf.url.del, {id: id});
+                });
+                break;
+            case 3:
+                btnDelete.addClass('uk-hidden');
+                keySelect.prop({disabled: false});
+                npForm[0].reset();
+                idInput.val();
+                break;
+        }
+    });
+
+    $('#npform').bind('submit', function () {
+        var id = $('#id');
+        var url = id.val() ? conf.url.update : conf.url.save;
+        handlePost(url, $(this).serialize());
+        return false;
+    });
+
+    function handlePost(url, data) {
+        $.ajax({
+            url: url,
+            data: data,
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            showMsg(data.msg, data.status>0);
+            if (data.status<1) return;
+            window.setTimeout(function(){
+                window.location.reload();
+            }, 500);
+        });
+    };
+
+    function showMsg(msg, stat){
+        UIkit.notify(msg, {pos:'top-right', status: stat ? 'success' : 'danger'});
+    };
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span>爬虫服务配置</span>
+    <li class="uk-active"><span>添加配置</span>
+</ul>
+<hr class="uk-article-divider">
+
+<div class="uk-row-indent">
+    <a href="#modal_bk" class="btn-ud uk-button uk-button-primary" data-index="3" data-uk-modal>添加配置</a>
+</div>
+
+
+<div class="uk-row-indent uk-grid">
+    <!--@
+    for (var i=0; i<props.~size; i++) {
+    -->
+    <div class="uk-width-medium-1-4 box-conf">
+        <div class="uk-panel uk-panel-box">
+            <div class="uk-panel-badge">
+                <a href="#modal_bk" class="btn-ud uk-button uk-button-link" data-index="1" data-prop="${toJson(props[i], true)}" data-uk-modal>编辑</a>
+            </div>
+            <h3 class="uk-text-primary uk-panel-title">${confKey(props[i].name)}</h3>
+            <p class="uk-text-success">${props[i].val, xss}
+            <p class="uk-text-muted conf-mark">${props[i].mark!'', xss}
+        </div>
+    </div>
+    <!--@
+    }
+    -->
+</div>
+
+
+
+
+
+
+
+<div id="modal_bk" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close" type="button"></button>
+        <div class="uk-modal-header">
+            <h2>编辑配置</h2>
+        </div>
+
+        <form id="npform" class="uk-form uk-form-stacked" autocomplete="off">
+            <div class="uk-form-row">
+                <label class="form-label" for="key">配置键</label>
+                <div class="uk-form-controls">
+                    <select name="key" id="key" class="uk-width-1-1" readonly required>
+                        <option value="">请选择
+                        <!--@
+                        for (var i=0; i<keys.~size; i++) {
+                        if (keys[i].key!='UNDEFINED') {
+                        -->
+                        <option value="${keys[i].key}">${confKey(keys[i].key)}
+                        <!--@
+                        }}
+                        -->
+                    </select>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label for="val" class="form-label">配置值</label>
+                <div class="uk-form-controls">
+                    <input type="text" name="val" id="val" class="uk-width-1-1" placeholder="配置值" required>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label for="mark" class="form-label">说明</label>
+                <textarea name="mark" id="mark" rows="5" class="uk-width-1-1" placeholder="说明"></textarea>
+            </div>
+            <div class="uk-form-row uk-text-right">
+                <button class="btn-ud btn-delete uk-button uk-button-danger" type="button" data-index="2">刪除</button>
+                <button class="uk-button uk-button-primary">提交</button>
+            </div>
+            <input type="hidden" id="id" name="id"/>
+        </form>
+
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

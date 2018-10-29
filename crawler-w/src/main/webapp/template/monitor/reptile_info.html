@@ -1,0 +1,54 @@
+<#compressor>
+<div class="box-slave-info">
+    <div class="list list-slave">
+        <h2>爬虫信息</h2>
+        <table class="pure-table pure-table-bordered">
+            <thead>
+            <tr>
+            <th>ID
+            <th>主机
+            <th>任务数
+            <th>更新时间
+            <tbody>
+            <!--@ for(var i=0; i<sies.~size; i++){
+            -->
+            <tr>
+            <td>${sies[i].cli}
+            <td>${sies[i].ip}
+            <td>${sies[i].amount}
+            <td>${sies[i].mtime, dateFormat='yyyy-MM-dd HH:mm:ss'}
+            <!--@
+            } -->
+        </table>
+    </div>
+    <div class="list list-job">
+        <h2>任务队列</h2>
+        <!--@
+        if (jes==null) {
+        -->
+        <p><strong>获取任务队列失败, 请检查配置后重新获取.</strong>
+        <!--@
+        } else {
+        -->
+        <table class="pure-table pure-table-horizontal">
+            <thead>
+            <tr>
+            <th>ID
+            <th>任务
+            <th>分配
+            <tbody>
+            <!--@for(var i=0; i<jes.~size; i++){
+            -->
+            <tr>
+            <td>${jes[i].jobId}
+            <td>${jes[i].source_name} - ${jes[i].keyword}
+            <td>${jes[i].machine}
+            <!--@
+            }-->
+        </table>
+        <!--@
+        }
+        -->
+    </div>
+</div>
+</#compressor>

@@ -1,0 +1,588 @@
+<!--@var title={-->配置<!--@};-->
+
+<!--@var header={-->
+<style>
+    .confdiv {
+        text-align: right;
+    }
+    .confdiv.left {
+        float: left;
+    }
+    .confdiv.right {
+        float: right;
+    }
+    .conf-detail {
+        padding: 10px 60px 20px 60px
+    }
+    .conf-btns {
+        text-align: center;
+        padding: 5px;
+    }
+    .detailPageForm {
+        display: inline;
+    }
+    /*.panel.window {
+        position: fixed !important;
+    }*/
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+$(document).ready(function(){
+
+    var conf = {
+        isAjax: 0,
+        url: {
+            conf_detail: basePath + '/website/conf/conf_detail',
+            save_conf_list: basePath + '/website/conf/save_conf_list',
+            save_conf_detail: basePath + '/website/conf/save_conf_detail'
+        },
+        data: {
+
+        }
+    };
+    window.c = conf;
+
+    $('#conflist').bind('submit', function(){
+        var valid = $(this).form('enableValidation').form('validate');
+        if (!valid) {
+            showValidatorDataMsg();
+            return false;
+        }
+        $.ajax({
+            url: conf.url.save_conf_list,
+            data: $(this).serialize(),
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            $.messager.show({
+                title: data.msg,
+                msg: data.status ? '规则提交成功' : '规则提交失败, 请检查输入后重新提交',
+                timeout: 3000,
+                showType: 'show'
+            });
+            if (data.msg) window.location.reload();
+        });
+        return false;
+    });
+
+    $('.goback').bind('click', function(){
+        window.history.go(-1);
+        return false;
+    });
+
+    $('form[id^=confdetail]').bind('submit', function(){
+        var valid = $(this).form('enableValidation').form('validate');
+        if (!valid) {
+            showValidatorDataMsg();
+            return false;
+        }
+        $.ajax({
+            url: conf.url.save_conf_detail,
+            data: $(this).serialize(),
+            type: 'post',
+            dataType: 'json'
+        }).done(function(data){
+            $.messager.show({
+                title: data.msg,
+                msg: data.status ? '规则提交成功' : '规则提交失败, 请检查输入后重新提交',
+                timeout: 3000,
+                showType: 'show'
+            });
+        });
+        return false;
+    });
+
+    $('#testConfList').bind('click', function(){
+        showAlpha('列表页规则');
+        return false;
+    });
+
+    $('.testConfDetail').bind('click', function(){
+        showAlpha('详细页规则');
+        return false;
+    });
+
+    $('.downloadpage').bind('click', function(){
+        showAlpha('下载详细页面');
+        return false;
+    });
+
+
+    function showValidatorDataMsg(){
+        $.messager.show({
+            title: '验证失败',
+            msg:'数据校验失败, 请检查输入后重试',
+            timeout:3000,
+            showType:'show'
+        });
+    };
+
+    function showAlpha(target){
+        $.messager.show({
+            title: '功能尚未完善',
+            msg: target + '功能尚未完善, 暂不可使用',
+            timeout: 3000,
+            showType: 'show'
+        });
+    };
+
+    function init(){
+
+    };
+
+    init();
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+
+
+<div>
+    <a href="#" class="linkbutton goback">前一个网页</a>
+    <a href="${basePath}/website" class="linkbutton">去网站列表</a>
+    <a class="linkbutton" href="${basePath}/website/section?id=${section.site}">去 ${section.comment} 板块列表</a>
+    <a href="${website.site}" target="_blank" title="点击打开 ${website.comment!''} 首页"><strong>${website.comment}</strong></a>
+    <span>-</span>
+    <a href="${section.url}" target="_blank" title="点击打开 ${website.comment!''} - ${section.comment!''} 板块页面"><strong>${section.comment}</strong></a>
+</div>
+<div class="form-wrapper" style="display: none;">
+    <a class="form-wrapper-close" href="javascript:void(0);"></a>
+    <div class="form-wrapper-title">以此规则添加新版块</div>
+    <div class="form-wrapper-center">
+        <form id="sectionForm" method="post" data-options="novalidate:true">
+            <div>
+                <label class="form-label">
+                    版块地址
+                    <input class="easyui-validatebox form-input" type="text" name="url" data-options="required:true" />
+                </label>
+            </div>
+            <div>
+                <label class="form-label">
+                    版块名称
+                    <input class="easyui-validatebox form-input" type="text" name="comment" data-options="required:true" />
+                </label>
+            </div>
+            <div>
+                <input class="form-btn" type="submit" value="保存" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!-- 列表页配置, 一个版块只有一个列表页配置 -->
+<div class="conf-panel">
+    <div class="easyui-panel conf-detail" title="列表页配置" data-options="collapsible:true">
+        <form class="confform" id="conflist" method="post" autocomplete="off">
+            <div class="confdiv left">
+                <!--@
+                if ('search'==section.category) {
+                -->
+                <div>
+                    <label class="form-label" for="keyword">搜索关键字
+                    <input type="text" name="keyword" id="keyword" class="easyui-textbox" data-options="required:true"/>
+                    </label>
+                </div>
+                <!--@
+                }
+                -->
+                <div>
+                    <label class="form-label">是否Ajax加载</label>
+                    <label><input type="radio" name="ajax" value="1" /> 是</label>
+                    <label><input type="radio" name="ajax" value="0"  /> 否</label>
+                </div>
+                <div>
+                    <label class="form-label">时间间隔(分钟)<span class="red">*</span>
+                    <input name="fetchinterval"
+                           class="easyui-numberbox"
+                           data-options="required:true,min:1,precision:0"
+                           value="${confList.fetchinterval!''}" />
+                    </label>
+                </div>
+            </div>
+            <div class="confdiv right">
+                <div>
+                    <label class="form-label">列表页DOM<span class="red">*</span>
+                    <input name="listdom" class="easyui-textbox" data-options="required:true" value="${confList.listdom!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">列表行DOM<span class="red">*</span>
+                    <input name="linedom" class="easyui-textbox" data-options="required:true" value="${confList.linedom!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">详细页URL DOM<span class="red">*</span>
+                    <input name="urldom" class="easyui-textbox" data-options="required:true" value="${confList.urldom!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label" title="当详细页中没有时填写"> 作者 DOM
+                    <input name="authordom" class="easyui-textbox"  value="${confList.authordom!'', xss}" />
+                    </label>
+                    <label class="form-label error" id="authordomerror"></label>
+                </div>
+                <div>
+                    <label class="form-label">更新时间DOM
+                    <input name="updatedom" class="easyui-textbox" value="${confList.updatedom!'', xss}" />
+                    </label>
+                    <label class="form-label error" id="updatedomerror"></label>
+                </div>
+                <div>
+                    <label class="form-label">发布日期DOM
+                    <input name="datedom" class="easyui-textbox" value="${confList.datedom!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label" title="搜索时的简介DOM">简介DOM
+                    <input name="synopsisdom" class="easyui-textbox" value="${confList.synopsisdom!'', xss}" />
+                    </label>
+                </div>
+            </div>
+            <div class="conf-btns">
+                <button type="button" class="easyui-linkbutton" id="testConfList">验证</button>
+                <button class="easyui-linkbutton" id="saveConfList">保存</button>
+            </div>
+            <input type="hidden" name="comment" id="comment" value="${section.comment!'', xss}"  />
+            <input type="hidden" name="url" id="url" value="${section.url }" />
+            <input type="hidden" name="section" value="${section.id }" />
+        </form>
+    </div>
+</div>
+
+<!--@
+if (0==confDetails.~size) {
+-->
+
+<div class="conf-panel">
+    <div class="easyui-panel conf-detail" title="详细页配置" data-options="collapsible:true">
+        <form id="confdetail-1" method="post" autocomplete="off">
+            <div class="confdiv left">
+                <div>
+                    <label class="form-label">
+                        测试页URL地址 <span class="red">*</span>
+                        <input name="testUrl" type="text" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        网页编码
+                        <input name="encode" type="text" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">是否Ajax加载</label>
+                    <label><input type="radio" name="ajax" value="1" checked="checked" /> 是</label>
+                    <label><input type="radio" name="ajax" value="0" /> 否</label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        域名 <span class="red">*</span>
+                        <input name="host" type="text" class="easyui-validatebox " data-options="required:true, multiline:true" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        回复数DOM
+                        <input name="replyNum" class="easyui-textbox easyui-tooltip" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        浏览数DOM
+                        <input name="reviewNum" class="easyui-textbox" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        转发数DOM
+                        <input name="forwardNum" class="easyui-textbox" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        来源DOM
+                        <input name="sources" class="easyui-textbox" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">抓取顺序</label>
+                    <label><input type="radio" name="fetchOrder" value="1" checked="checked" /> 从第一页开始</label>
+                    <label><input type="radio" name="fetchOrder" value="0" /> 从最后一页开始</label>
+                </div>
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>主帖</legend>
+                    <div>
+                        <label class="form-label">
+                            主帖DOM<span class="red">*</span>
+                            <input name="master" class="required, easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            楼主DOM<span class="red">*</span>
+                            <input name="author" class="required, easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            发布时间DOM
+                            <input name="date" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM<span class="red">*</span>
+                            <input name="content" class="required, easyui-textbox" />
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="confdiv" style="float: right; text-align: right;">
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>回复</legend>
+                    <div>
+                        <label class="form-label">
+                            回复DOM
+                            <input name="reply" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            作者DOM
+                            <input name="replyAuthor" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            回复时间DOM
+                            <input name="replyDate" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM
+                            <input name="replyContent" class="easyui-textbox" />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>子回复</legend>
+                    <div>
+                        <label class="form-label">
+                            子回复DOM
+                            <input name="subReply" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            作者DOM
+                            <input name="subReplyAuthor" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            回复时间DOM
+                            <input name="subReplyDate" class="easyui-textbox" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM
+                            <input name="subReplyContent" class="easyui-textbox" />
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+            <div style="text-align: center; padding: 5px">
+                <button type="button" class="easyui-linkbutton testConfDetail">验证</button>
+                <button class="easyui-linkbutton">保存</button>
+                <br />
+                <div class="detailPageForm">
+                    <input type="text" name="url" value=""  hidden="hidden" />
+                    <input type="text" name="ax" value="false"  hidden="hidden" />
+                    <!--<input type="button" value="下载详细页面" class="downloadpage easyui-linkbutton" />-->
+                    <button type="button" class="downloadpage easyui-linkbutton">下载详细页面</button>
+                </div>
+            </div>
+            <input name="listurl" type="hidden" value="${section.url!'' }" />
+        </form>
+    </div>
+</div>
+
+<!--@
+} else {
+for(var i=0; i<confDetails.~size; i++) {
+-->
+
+<div class="conf-panel">
+    <div class="easyui-panel conf-detail" title="详细页配置" data-options="collapsible:true,collapsed:false">
+        <form id="confdetail-${i}" method="post" autocomplete="off">
+            <div class="confdiv left">
+                <div>
+                    <label class="form-label">
+                        测试页URL地址<span class="red">*</span>
+                        <input name="testUrl" type="text" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        网页编码
+                        <input name="encode" type="text" value="${confDetails[i].encode!'', xss}"/>
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">是否Ajax加载</label>
+                    <label><input type="radio" name="ajax" value="1"  /> 是</label>
+                    <label><input type="radio" name="ajax" value="0" /> 否</label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        域名<span class="red">*</span>
+                        <input name="host" type="text" class="easyui-validatebox " value="${confDetails[i].host!'', xss}" data-options="required:true, multiline:true" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        回复数DOM
+                        <input name="replyNum" class="easyui-textbox easyui-tooltip" value="${confDetails[i].replyNum!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        浏览数DOM
+                        <input name="reviewNum" class="easyui-textbox" value="${confDetails[i].reviewNum!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        转发数DOM
+                        <input name="forwardNum" class="easyui-textbox" value="${confDetails[i].forwardNum!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">
+                        来源DOM
+                        <input name="sources" class="easyui-textbox" value="${confDetails[i].sources!'', xss}" />
+                    </label>
+                </div>
+                <div>
+                    <label class="form-label">抓取顺序</label>
+                    <label><input type="radio" name="fetchOrder" value="1"  /> 从第一页开始</label>
+                    <label><input type="radio" name="fetchOrder" value="0"  /> 从最后一页开始</label>
+                </div>
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>主帖</legend>
+                    <div>
+                        <label class="form-label">
+                            主帖DOM <span class="red">*</span>
+                            <input name="master" class="required, easyui-textbox" value="${confDetails[i].master!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            楼主DOM<span class="red">*</span>
+                            <input name="author" class="required, easyui-textbox" value="${confDetails[i].author!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            发布时间DOM
+                            <input name="date" class="easyui-textbox" value="${confDetails[i].date!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM<span class="red">*</span>
+                            <input name="content" class="required, easyui-textbox" value="${confDetails[i].content!'', xss}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="confdiv" style="float: right; text-align: right;">
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>回复</legend>
+                    <div>
+                        <label class="form-label">
+                            回复DOM
+                            <input name="reply" class="easyui-textbox" value="${confDetails[i].reply!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            作者DOM
+                            <input name="replyAuthor" class="easyui-textbox" value="${confDetails[i].replyAuthor!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            回复时间DOM
+                            <input name="replyDate" class="easyui-textbox" value="${confDetails[i].replyDate!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM
+                            <input name="replyContent" class="easyui-textbox" value="${confDetails[i].replyContent!'', xss}" />
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset style="border: 1px solid #e3e3de">
+                    <legend>子回复</legend>
+                    <div>
+                        <label class="form-label">
+                            子回复DOM
+                            <input name="subReply" class="easyui-textbox" value="${confDetails[i].subReply!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            作者DOM
+                            <input name="subReplyAuthor" class="easyui-textbox" value="${confDetails[i].subReplyAuthor!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            回复时间DOM
+                            <input name="subReplyDate" class="easyui-textbox" value="${confDetails[i].subReplyDate!'', xss}" />
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">
+                            内容DOM
+                            <input name="subReplyContent" class="easyui-textbox" value="${confDetails[i].subReplyContent!'', xss}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </div>
+            <div style="text-align: center; padding: 5px">
+                <button type="button" class="easyui-linkbutton testConfDetail">验证</button>
+                <button class="easyui-linkbutton">保存</button>
+                <br />
+                <div class="detailPageForm">
+                    <input type="text" name="url" value=""  hidden="hidden" />
+                    <input type="text" name="ax" value="false"  hidden="hidden" />
+                    <!--<input type="button" value="下载详细页面" class="downloadpage easyui-linkbutton" />-->
+                    <button type="button" class="downloadpage easyui-linkbutton">下载详细页面</button>
+                </div>
+            </div>
+            <input name="listurl" type="hidden" value="${section.url}" />
+            <!--<input name="listurl" type="hidden" value="${confList.url }" />-->
+            <input name="oldHost" type="hidden" value="${confDetails[i].host }" />
+        </form>
+    </div>
+</div>
+
+<!--@
+}}
+-->
+
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

@@ -1,0 +1,356 @@
+<!--@var title={-->网站配置<!--@};-->
+
+<!--@var header={-->
+<style>
+    .box-site {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .box-search {
+        background: #f5f5f5;
+        padding: 15px;
+    }
+    #searchForm label,
+    #searchForm select,
+    #searchForm a {
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script src="${resPath}/js/location.js?id=2"></script>
+<script>
+    $(document).ready(function(){
+
+        var conf = {
+            url: {
+                save: basePath + '/website/save',
+                update: basePath + '/website/update',
+                del: basePath + '/website/delete'
+            }
+        };
+
+        $('.site-li').bind('mouseover', function(){
+            $(this).find('.edit').show();
+        }).bind('mouseout', function(){
+            $(this).find('.edit').hide();
+        });
+
+        $('.box-site .btn-edit').bind('click', function(){
+            try {
+                $('.form-btn[data-index=0]').show();
+                locationKit.renderOption($('.upfp'), 0);
+                var data = $(this).data('website');
+                $('#option').val(1);
+                $('#site').val(data.site);
+                $('#comment').val(data.comment);
+                $('#tid').val(data.tid);
+                $('.upfregion[value='+data.region+']').prop('checked', true);
+                $('.upfstat[value='+data.status+']').prop('checked', true);
+                $('.upfp').val(data.provinceid||'');
+                $('#upfid').val(data.id);
+                $('#type').val(data.type_id ? data.type_id : '');
+                $('#cookie').val(data.cookie);
+                locationKit.renderOption($('.upfc'), data.provinceid, function(){
+                    $('.upfc').val(data.cityid||'');
+                    locationKit.renderOption($('.upfa'), data.cityid, function(){
+                        $('.upfa').val(data.areaid||'');
+                    });
+                });
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
+        $('#selProvince, .upfp').bind('change', function(){
+            var index = $(this).data('index');
+            $(index==1 ? '#selDistrict' : '.upfa').html('<option value="">请选择');
+            locationKit.renderOption($(index==1 ? '#selCity' : '.upfc'), $(this).val());
+        });
+        $('#selCity, .upfc').bind('change', function(){
+            var index = $(this).data('index');
+            locationKit.renderOption($(index==1 ? '#selDistrict' : '.upfa'), $(this).val());
+        });
+
+        $('.form-btn').bind('click', function(){
+            var option = $('#option').val();
+            var index = $(this).data('index');
+            if (index) {
+                if (!$('#site').val()) { renderModelResult('站点地址必填', 'danger'); return false; }
+                if (!$('#comment').val()) { renderModelResult('名称必填', 'danger'); return false; }
+                if (!$('#tid').val()) { renderModelResult('来源必填', 'danger'); return false; }
+                if (!$('#type').val()) { renderModelResult('请选择类型', 'danger'); return false; }
+            }
+            if (option==0) {
+                saveWebsite(conf.url.save);
+                return false;
+            }
+            index ? udpateWebsite(conf.url.update) : deleteWebsite(conf.url.del, $('#upfid').val());
+            return false;
+        });
+        $('#addWebsiteBtn').bind('click', function(){
+            locationKit.renderOption($('.upfp'), 0);
+            $('.form-wrapper').show();
+            $('#option').val(0);
+            $('.form-btn[data-index=0]').hide();
+            $('#websiteForm')[0].reset();
+        });
+
+        $('#websiteForm .upfregion').bind('change', function(){
+            $('.form-wrapper .location').css({display: window.parseInt($(this).val()) ? 'block' : 'none'});
+            return false;
+        });
+
+
+        function saveWebsite(url){
+            $.ajax({
+                url: url,
+                data: $('#websiteForm').serialize(),
+                type: 'post',
+                dataType: 'json'
+            }).done(function(data){
+                renderModelResult(data.msg, data.status>0 ? 'success' : 'danger');
+                console.log(!data.status);
+                if (data.status<1) return;
+                window.setTimeout(function(){
+                    window.location.reload();
+                }, 500);
+            });
+        };
+
+        function udpateWebsite(url){
+            $.ajax({
+                url: url,
+                data: $('#websiteForm').serialize(),
+                type: 'post',
+                dataType: 'json'
+            }).done(function(data){
+                renderModelResult(data.msg, data.status>0 ? 'success' : 'danger');
+                if (data.status<1) return;
+                window.setTimeout(function(){
+                    window.location.reload();
+                }, 500);
+            });
+        };
+
+        function deleteWebsite(url, id){
+            UIkit.modal.confirm('确定删除当前网站?', function(){
+                $.ajax({
+                    url: url,
+                    data: {id: id},
+                    dataType: 'json'
+                }).done(function(data){
+                    renderModelResult(data.msg, data.status>0 ? 'success' : 'danger');
+                    if (data.status<1) return;
+                    window.setTimeout(function(){
+                        window.location.reload();
+                    }, 500);
+                });
+                return false;
+            });
+        };
+
+        function renderModelResult(html, stat){
+            UIkit.notify(html, {pos:'top-right', status: stat});
+        };
+
+        function bindSearchType() {
+            var searchType = $('#search_type');
+            var search  = searchType.data('search');
+            searchType.val(search ? search : '');
+        }
+
+        locationKit.renderOption($('#selProvince'), 0, function(){
+            var p = '${paras.provinceId}',
+                    c = '${paras.cityId}',
+                    a = '${paras.areaId}';
+            $('#selProvince').val(p);
+            !p||$('#selProvince').change();
+            window.setTimeout(function(){
+                $('#selCity').val(c);
+                !c||$('#selCity').change();
+                window.setTimeout(function(){
+                    $('#selDistrict').val(a);
+                }, 200);
+            }, 200);
+        });
+        bindSearchType();
+    });
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+</ul>
+<hr class="uk-article-divider">
+
+<div class="box-search">
+    <form class="uk-form" id="searchForm" action="${basePath}/website" autocomplete="off">
+        <fieldset>
+            <!--<legend>筛选</legend>-->
+            <div class="uk-form-row">
+                <label class="uk-form-label">区域:</label>
+                <label><input type="radio" name="region" value="1" > 境内</label>
+                <label><input type="radio" name="region" value="0" > 境外</label>
+            </div>
+
+            <div class="uk-form-row">
+                <label class="uk-form-label">城市: </label>
+                <select id="selProvince" name="provinceId" data-index="1">
+                    <option value="">--请选择省份--</option>
+                </select>
+                <select id="selCity" name="cityId" data-index="1">
+                    <option value="">--请选择城市--</option>
+                </select>
+                <select id="selDistrict" name="areaId" data-index="1">
+                    <option value="">--请选择区/县--</option>
+                </select>
+            </div>
+
+            <div class="uk-form-row">
+                <label class="uk-form-label">状态:</label>
+                <label><input type="radio"  name="status" value="open" ${paras.status!'open'=='open' ? 'checked' : ''}> 启用</label>
+                <label><input type="radio" name="status" value="close" ${paras.status!'open'=='close' ? 'checked' : ''}> 禁用</label>
+            </div>
+
+            <div class="uk-form-row">
+                <label for="search_comment" class="uk-form-label">站点名称: </label>
+                <input name="comment" id="search_comment" value="${paras.comment!''}" placeholder="站点名称" />
+            </div>
+
+            <div class="uk-form-row">
+                <label for="search_type" class="uk-form-label">类型: </label>
+                <select name="type" id="search_type" data-search="${paras.type!0}">
+                    <option value="">请选择</option>
+                    <!--@
+                    for (var i=0; i<types.~size!0; i++) {
+                    -->
+                    <option value="${types[i].type}">${jobType(types[i].type)}
+                    <!--@
+                    }
+                    -->
+                </select>
+            </div>
+
+            <div class="uk-form-row">
+                <button class="uk-button uk-button-primary">筛选</button>
+
+                <a href="${basePath}/website">清除条件</a>
+                <a id="addWebsiteBtn" href="#editsite" data-uk-modal>添加网站</a>
+            </div>
+        </fieldset>
+    </form>
+</div>
+<div class="uk-row-indent">
+    <div class="uk-grid">
+        <!--@
+        for(var i=0; i<p.list.~size; i++) {
+        -->
+        <div class="uk-width-medium-1-3 box-site">
+            <div class="uk-panel uk-panel-box uk-panel-box-hover">
+                <div class="uk-panel-badge uk-badge uk-badge-${p.list[i].type_id==0 ? 'danger' : 'primary'}">${p.list[i].type_name!'UNKNOW'}</div>
+                <h3 class="uk-panel-title">${p.list[i].comment}</h3>
+                <a href="#editsite" data-id="${p.list[i].id}"
+                   data-website="${toJson(p.list[i], 1)}"
+                   title="编辑 [${p.list[i].comment}]"
+                   class="uk-button btn-edit"
+                   data-uk-modal>编辑</a>
+                <a href="${basePath}/website/section?id=${p.list[i].id}" title="查看 [${p.list[i].comment}] 板块" class="uk-button">板块</a>
+            </div>
+        </div>
+        <!--@
+        }
+        -->
+    </div>
+</div>
+${pagination(request, p.totalRow, p.totalPage, p.pageNumber, p.pageSize, 'page')}
+
+
+<div id="editsite" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close" type="button"></button>
+        <div class="uk-modal-header">
+            <h2>编辑站点</h2>
+        </div>
+        <form id="websiteForm" method="post" class="uk-form uk-form-stacked" autocomplete="off">
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="site">站点地址</label>
+                <div class="uk-form-controls">
+                    <input id="site" type="text" name="site" class="uk-width-1-1" placeholder="站点地址"/>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="comment">网站名称</label>
+                <div class="uk-form-controls">
+                    <input id="comment" type="text" name="comment" class="uk-width-1-1" placeholder="网站名称" />
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="tid">来源 ID</label>
+                <div class="uk-form-controls">
+                    <input id="tid" type="text" name="tid" class="uk-width-1-1" placeholder="来源 ID" />
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label" for="type">类型</label>
+                <div class="uk-form-controls">
+                    <select name="type" id="type" class="uk-width-1-1" required>
+                        <option value="">请选择</option>
+                        <!--@
+                        for (var i=0; i<types.~size!0; i++) {
+                        -->
+                        <option value="${types[i].type}">${jobType(types[i].type)}
+                        <!--@
+                        }
+                        -->
+                    </select>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">区域</label>
+                <div class="uk-form-controls">
+                    <label><input type="radio" name="region" class="upfregion" value="1" checked="checked"> 境内</label>
+                    <label><input type="radio" name="region" class="upfregion" value="0"> 境外</label>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">城市</label>
+                <div class="uk-form-controls">
+                    <div class="location">
+                        <select name="provinceId" class="upfp" data-index="2"><option value="">--请选择省份--</option></select>
+                        <select name="cityId" class="upfc" data-index="2"><option value="">--请选择城市--</option></select>
+                        <select name="areaId" class="upfa" data-index="2"><option value="">--请选择区/县--</option></select>
+                    </div>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">状态</label>
+                <div class="uk-form-controls">
+                    <label><input type="radio" name="status" class="upfstat" value="open" checked="checked"> 启用</label>
+                    <label><input type="radio" name="status" class="upfstat" value="close"> 禁用</label>
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label for="cookie" class="uk-form-label">Cookie</label>
+                <div class="uk-form-controls">
+                    <textarea name="cookie" id="cookie" class="uk-width-1-1" placeholder="cookie"></textarea>
+                </div>
+            </div>
+            <div class="uk-modal-footer uk-text-right">
+                <button class="form-btn uk-button uk-button-danger" type="button" data-index="0">删除</button>
+                <button class="form-btn uk-button uk-button-primary" data-index="1">保存</button>
+            </div>
+            <input type="hidden" id="option" name="option"/>
+            <input type="hidden" name="id" id="upfid">
+        </form>
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

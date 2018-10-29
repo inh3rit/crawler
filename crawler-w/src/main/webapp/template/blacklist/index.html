@@ -1,0 +1,184 @@
+<!--@var title={-->黑名單<!--@};-->
+
+<!--@var header={-->
+
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+    $(document).ready(function(){
+
+        $('#blkform').bind('submit', function(){
+            try {
+                if (!verifyRegex($('#url').val(), $('#regex').val())) {
+                    return false;
+                }
+                var id = $('#id').val();
+                var url = basePath + '/blacklist/' + (id ? 'update' : 'save');
+                opBlacklist(url, $(this).serialize());
+            } catch (e){console.log(e)}
+            return false;
+        });
+
+        $('.btn-ud').bind('click', function(){
+            var index = $(this).data('index');
+            var btnDelete = $('.btn-delete');
+            var idInput = $('#id');
+            switch (index) {
+                case 1:
+                    var bkl = $(this).parent().parent().data('bkl');
+                    idInput.val(bkl.id);
+                    $('#name').val(bkl.name);
+                    $('#regex').val(bkl.regex);
+                    $('#summary').val(bkl.summary);
+                    btnDelete.removeClass('uk-hidden');
+                    break;
+                case 2:
+                    UIkit.modal.confirm('确定删除此条黑名单?', function(){
+                        opBlacklist(basePath + '/blacklist/del', {id: idInput.val()});
+                    });
+                    break;
+                case 3:
+                    $('#blkform')[0].reset();
+                    btnDelete.addClass('uk-hidden');
+                    idInput.val();
+                    break;
+            }
+        });
+
+        function verifyRegex(url, regex) {
+            var res = url.match(new RegExp(regex, 'gi'));
+            if (res!=null&&res.length) {
+                showMsg('驗證成功, 正在提交', true);
+                return true;
+            }
+            showMsg('規則錯誤, 無法通過驗證', false);
+            return false;
+        };
+
+        function opBlacklist(url, data){
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'post',
+                dataType: 'json'
+            }).done(function(data){
+                showMsg(data.msg, data.status>0);
+                window.setTimeout(function(){
+                    window.location.reload();
+                }, 500);
+            });
+        };
+
+        function showMsg(msg, stat){
+            UIkit.notify(msg, {pos:'top-right', status: stat ? 'success' : 'danger'});
+        };
+    });
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span class="uk-active">黑名单</span>
+</ul>
+<hr class="uk-article-divider">
+
+<div class="uk-row-indent">
+    <a href="#modal_bk" class="btn-ud uk-button uk-button-primary" data-index="3" data-uk-modal>添加黑名單</a>
+</div>
+
+<div class="uk-row-indent">
+${pagination(request, p.totalRow, p.totalPage, p.pageNumber, p.pageSize, 'page')}
+</div>
+
+<div class="uk-row-indent">
+    <table class="uk-table uk-table-hover uk-table-striped">
+        <thead>
+        <tr>
+        <th>名稱
+        <th>規則
+        <th>描述
+        <th>最後操作時間
+        <th>#
+        <tbody>
+        <!--@
+        for (var i=0; i<p.list.~size; i++) {
+        -->
+        <tr data-bkl="${toJson(p.list[i], 1)}">
+        <td>${p.list[i].name!'', xss}
+        <td>${p.list[i].regex!'', xss}
+        <td>${p.list[i].summary!'', xss}
+        <td>${p.list[i].mtime, dateFormat='yyyy-MM-dd HH:mm:ss'}
+        <td><a href="#modal_bk" class="btn-ud uk-button" data-index="1" data-uk-modal>编辑</a>
+        <!--@
+        }
+        -->
+    </table>
+</div>
+
+<div class="uk-row-indent">
+${pagination(request, p.totalRow, p.totalPage, p.pageNumber, p.pageSize, 'page')}
+</div>
+
+<div id="modal_bk" class="uk-modal">
+    <div class="uk-modal-dialog">
+        <button class="uk-modal-close uk-close" type="button"></button>
+        <div class="uk-modal-header">
+            <h2>编辑黑名单</h2>
+        </div>
+
+        <form id="blkform" class="uk-form uk-form-stacked" autocomplete="off">
+            <div class="uk-form-row">
+                <label class="form-label" for="name">名稱</label>
+                <div class="uk-form-controls">
+                    <input class="uk-width-1-1"
+                           type="text"
+                           id="name"
+                           name="name"
+                           placeholder="名稱"
+                           required />
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-label" for="regex">規則</label>
+                <div class="uk-form-controls">
+                    <input class="uk-width-1-1"
+                           type="text"
+                           id="regex"
+                           name="regex"
+                           placeholder="規則"
+                           required />
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-url" for="url">驗證鏈接</label>
+                <div class="uk-form-controls">
+                    <input class="uk-width-1-1"
+                           type="text"
+                           id="url"
+                           name="url"
+                           placeholder="驗證鏈接"
+                           required />
+                </div>
+            </div>
+            <div class="uk-form-row">
+                <label class="form-label" for="summary">描述</label>
+                <div class="uk-form-controls">
+                    <textarea class="uk-width-1-1" id="summary" name="summary" placeholder="黑名单描述" required></textarea>
+                </div>
+            </div>
+            <div class="uk-form-row uk-text-right">
+                <button class="btn-ud btn-delete uk-button uk-button-danger" type="button" data-index="2">刪除</button>
+                <button class="uk-button uk-button-primary">驗證 & 提交</button>
+            </div>
+            <input type="hidden" id="id" name="id"/>
+        </form>
+
+    </div>
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

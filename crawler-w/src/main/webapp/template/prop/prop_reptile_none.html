@@ -1,0 +1,49 @@
+<!--@var title={-->区域配置选择<!--@};-->
+
+<!--@var header={-->
+
+<!--@};-->
+
+<!--@var footer={-->
+
+<!--@};-->
+
+<!--@var container={-->
+
+<ul class="uk-breadcrumb">
+    <li><a href="${basePath}/website">網站列表</a>
+    <li><span>爬虫服务配置</span>
+    <li class="uk-active"><span>区域配置选择</span>
+</ul>
+<hr class="uk-article-divider">
+
+
+<div class="uk-overflow-container">
+    <table class="uk-table uk-table-striped uk-table-hover">
+        <thead>
+        <tr>
+            <th>名称
+            <th>别名
+            <th>任务类型
+            <th>操作
+        <tbody>
+        <!--@ for(var i=0; i<reptiles.~size; i++) {
+        -->
+        <tr>
+            <td>${reptiles[i].name}
+            <td>${reptiles[i].alias}
+            <td>${reptiles[i].type_name}
+            <td>
+            <a href="${basePath}/prop/prop_reptile?reptile=${reptiles[i].id}" class="uk-button uk-button-link">配置</a>
+            <!--@
+            }
+            -->
+    </table>
+</div>
+
+
+
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->

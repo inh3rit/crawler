@@ -1,0 +1,191 @@
+<!--@var title={-->爬虫监控<!--@};-->
+
+<!--@var header={-->
+<link rel="stylesheet" href="${resPath}/css/monitor.css"/>
+<link rel="stylesheet" href="${resPath}/css/table.css"/>
+<style>
+    .box-panel {
+        margin-bottom: 3px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+    .box-panel .panel-title {
+        height: 30px;
+        background: #1ba1e2;
+        color: #fff;
+        font-size: 25px;
+        padding: 5px;
+        -webkit-box-shadow: 0 2px 5px -1px rgba(0,0,0,0.72);
+        -moz-box-shadow: 0 2px 5px -1px rgba(0,0,0,0.72);
+        box-shadow: 0 2px 5px -1px rgba(0,0,0,0.72);
+    }
+    .box-panel .panel-content {
+        display: none;
+        word-wrap: break-word;
+        word-break: normal;
+        transition: .2s;
+    }
+    .box-panel .panel-content.show {
+        display: block;
+        padding: 5px;
+    }
+    .box-panel .panel-title .panel-title-left,
+    .box-panel .panel-title .panel-title-right{
+        display: block;
+        width: 48%;
+        height: 100%;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    .box-panel .panel-title .panel-title-left {
+        float: left;
+        line-height: 30px;
+    }
+    .box-panel .panel-title .panel-title-right {
+        float: right;
+        text-align: right;
+    }
+    .spider-name {
+        /*line-height: 30px;*/
+    }
+    .monitor-loading {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+        background: url('${resPath}/img/loading.gif') no-repeat;
+        background-size: 100% 100%;
+    }
+    .pure-table {
+        width: 100%;
+    }
+</style>
+<!--@};-->
+
+<!--@var footer={-->
+<script>
+$(document).ready(function(){
+
+    var conf = {
+        url: {
+            spider_info: basePath + '/monitor/spider_info'
+        },
+        reptile: ${paras.reptile!'0'}
+    };
+
+    $('.btn-operate').bind('click', function(){
+        var index = $(this).data('index'),
+            itera = $(this).data('itera'),
+            open = $(this).data('open'),
+            panelContent = $('#content-' + itera),
+            reptile = $(this).parent().data('reptile');
+        switch (index) {
+            case 1:
+                accordion(panelContent, open, reptile, this);
+                break;
+            case 2:
+                addJob(panelContent);
+                break;
+            case 3:
+                refreData(panelContent, open, reptile, this);
+                break;
+            default :
+                break;
+        }
+        return false;
+    });
+
+
+    function refreData(panelContent, open, reptile, target) {
+        var btnOpen = $(target).prev();
+        btnOpen.data('open', 1);
+        btnOpen.text('收起');
+        showPanelContent(panelContent);
+        getSpiderInfo(panelContent, reptile);
+    };
+
+    function accordion(panelContent, open, reptile, target) {
+        open ?
+        hidePanelContent(panelContent) :
+        showPanelContent(panelContent);
+        open||getSpiderInfo(panelContent, reptile);
+        $(target).data('open', open ? 0 : 1);
+        $(target).text(open ? '展开' : '收起');
+    }
+
+    /**
+     * 获取爬虫信息
+     * @param panelContent 所对应的 panel content dom, jQuery 对象
+     */
+    function getSpiderInfo(panelContent, reptile){
+        // panelContent.html(x);
+        $.ajax({
+            url: conf.url.spider_info,
+            data: {reptile: reptile.id},
+            dataType: 'text'
+        }).done(function(data){
+            panelContent.html(data);
+        });
+    };
+
+    /**
+     * 添加网络巡检任务
+     * @param panelContent
+     */
+    function addJob(panelContent){
+
+    };
+
+    function showPanelContent(target, content){
+        target.addClass('show');
+        if (content)
+            target.html('<div class="monitor-loading"></div>');
+    };
+
+    function hidePanelContent(target){
+        target.removeClass('show');
+        // target.empty();
+    };
+
+    function init(){
+        var reptile = conf.reptile;
+        if (reptile) $('button[data-reptile='+reptile+']').click();
+    };
+
+    init();
+});
+</script>
+<!--@};-->
+
+<!--@var container={-->
+
+<div class="box-spdlist">
+    <!--@
+    for(var i=0; i<reptiles.~size; i++) {
+    -->
+    <div class="box-panel">
+        <div class="panel-title">
+            <div class="panel-title-left">
+                <span class="spider-name">${reptiles[i].name}</span>
+            </div>
+            <div class="panel-title-right" data-reptile="${toJson(reptiles[i], 1)}">
+                <!--@
+                if (2==reptiles[i].type) {
+                -->
+                <button class="btn-operate" data-index="2" data-itera="${i}">添加任务</button>
+                <!--@
+                }
+                -->
+                <button class="btn-operate" data-index="1" data-itera="${i}" data-open="0" data-reptile="${reptiles[i].id}">展开</button>
+                <button class="btn-operate" data-index="3" data-itera="${i}" data-open="0" data-reptile="${reptiles[i].id}">刷新</button>
+            </div>
+        </div>
+        <div class="panel-content" id="content-${i}"></div>
+    </div>
+    <!--@
+    }
+    -->
+</div>
+
+<!--@};-->
+
+<!--@include("/layout/layout_default.html", {title: title, header: header, container: container, footer: footer}){}-->
